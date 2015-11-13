@@ -204,24 +204,23 @@ hr {
 <h2>Loading and preprocessing the data</h2>
 
 <blockquote>
-<ol>
-<li>Load the data (i.e. <code>read.csv()</code>)</li>
-</ol>
+<p>Load the data (i.e. <code>read.csv()</code>)</p>
 </blockquote>
 
 <pre><code class="r">if (!file.exists(&quot;activity.zip&quot;)) {
-    download.file(&quot;https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip&quot;, &quot;activity.zip&quot;)
+    download.file(&quot;https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip&quot;, 
+                  &quot;activity.zip&quot;)
 }
 if (!file.exists(&quot;activity.csv&quot;)) {
     unzip(&quot;activity.zip&quot;, &quot;activity.csv&quot;)
 }
-data &lt;- read.csv(&quot;activity.csv&quot;, colClasses = c(&quot;numeric&quot;, &quot;Date&quot;, &quot;integer&quot;))
+data &lt;- read.csv(&quot;activity.csv&quot;, 
+                 header = TRUE,
+                 colClasses = c(&quot;numeric&quot;, &quot;Date&quot;, &quot;integer&quot;))
 </code></pre>
 
 <blockquote>
-<ol>
-<li>Process/transform the data (if necessary) into a format suitable for your analysis</li>
-</ol>
+<p>Process/transform the data (if necessary) into a format suitable for your analysis</p>
 </blockquote>
 
 <pre><code class="r"># data with filtered NA step values
@@ -232,19 +231,15 @@ data.nona &lt;- data %&gt;% filter(!is.na(steps))
 <h2>What is mean total number of steps taken per day?</h2>
 
 <blockquote>
-<ol>
-<li>Calculate the total number of steps taken per day</li>
-</ol>
+<p>Calculate the total number of steps taken per day</p>
 </blockquote>
 
 <pre><code class="r">perDay &lt;- data.nona %&gt;% group_by(date) %&gt;% summarise(totalsteps = sum(steps))
 </code></pre>
 
 <blockquote>
-<ol>
-<li>Make a histogram of the total number of steps taken each day</li>
-<li>Calculate and report the mean and median of the total number of steps taken per day</li>
-</ol>
+<p>Make a histogram of the total number of steps taken each day
+Calculate and report the mean and median of the total number of steps taken per day</p>
 </blockquote>
 
 <pre><code class="r">hist(perDay$totalsteps, 
@@ -273,14 +268,12 @@ legend(&quot;topright&quot;,
 <h2>What is the average daily activity pattern?</h2>
 
 <blockquote>
-<ol>
-<li>Make a time series plot (i.e. <code>type = &quot;l&quot;</code>) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)</li>
-<li>Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</li>
-</ol>
+<p>Make a time series plot (i.e. <code>type = &quot;l&quot;</code>) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</p>
 </blockquote>
 
 <pre><code class="r">perInterval &lt;- data.nona %&gt;% group_by(interval) %&gt;% summarise(meansteps = mean(steps))
-with(perInterval, plot(interval, meansteps, type = &quot;l&quot;))
+plot(meansteps ~ interval, perInterval, type = &quot;l&quot;)
 maxStepsInterval &lt;- perInterval$interval[which.max(perInterval$meansteps)]
 abline(v = maxStepsInterval, lwd = 2, lty = 2, col = &quot;blue&quot;)
 </code></pre>
@@ -292,9 +285,7 @@ abline(v = maxStepsInterval, lwd = 2, lty = 2, col = &quot;blue&quot;)
 <h2>Imputing missing values</h2>
 
 <blockquote>
-<ol>
-<li>Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)</li>
-</ol>
+<p>Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)</p>
 </blockquote>
 
 <pre><code class="r">data %&gt;% group_by(is.na(steps)) %&gt;% summarise(total.count = n())
@@ -309,20 +300,17 @@ abline(v = maxStepsInterval, lwd = 2, lty = 2, col = &quot;blue&quot;)
 </code></pre>
 
 <blockquote>
-<ol>
-<li>Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.</li>
-</ol>
+<p>Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.</p>
 </blockquote>
 
 <p>I will use the means for the 5-minute intervals as fillers for missing values.</p>
 
 <blockquote>
-<ol>
-<li>Create a new dataset that is equal to the original dataset but with the missing data filled in.</li>
-</ol>
+<p>Create a new dataset that is equal to the original dataset but with the missing data filled in.</p>
 </blockquote>
 
-<pre><code class="r">noNA &lt;- function(a, b) {
+<pre><code class="r"># returns a is available, otherwise returns b
+noNA &lt;- function(a, b) {
     if (is.na(a)) {
         b
     } else {
@@ -336,9 +324,7 @@ data.filled &lt;- data %&gt;% left_join(perInterval, by = &quot;interval&quot;) 
 </code></pre>
 
 <blockquote>
-<ol>
-<li>Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?</li>
-</ol>
+<p>Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?</p>
 </blockquote>
 
 <pre><code class="r">perDay &lt;- data.filled %&gt;% group_by(date) %&gt;% summarise(totalsteps = sum(steps))
@@ -370,9 +356,7 @@ legend(&quot;topright&quot;,
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
 
 <blockquote>
-<ol>
-<li>Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.</li>
-</ol>
+<p>Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.</p>
 </blockquote>
 
 <pre><code class="r">data.filled$daytype &lt;- factor(weekdays(data.filled$date) %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;),
@@ -380,9 +364,7 @@ legend(&quot;topright&quot;,
 </code></pre>
 
 <blockquote>
-<ol>
-<li>Make a panel plot containing a time series plot (i.e. type = &ldquo;l&rdquo;) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).</li>
-</ol>
+<p>Make a panel plot containing a time series plot (i.e. type = &ldquo;l&rdquo;) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).</p>
 </blockquote>
 
 <pre><code class="r">library(lattice)
